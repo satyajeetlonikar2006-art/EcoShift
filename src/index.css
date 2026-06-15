@@ -212,6 +212,12 @@ input, select, textarea {
   transition: var(--transition);
 }
 
+select option {
+  background-color: var(--bg-surface-opaque);
+  color: var(--text-primary);
+}
+
+
 input:focus, select:focus, textarea:focus {
   outline: none;
   border-color: var(--color-primary);
