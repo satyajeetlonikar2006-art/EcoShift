@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Dashboard } from '@/components/Dashboard';
 import { signInAnonymously, signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/services/firebase';
+import { auth, isMockMode } from '@/services/firebase';
 
 function App() {
   const { user, loading, error: authError } = useAuth();
@@ -14,9 +14,8 @@ function App() {
   const handleGuestLogin = async () => {
     setLoggingIn(true);
     setError(null);
-    const isMock = import.meta.env.VITE_FIREBASE_API_KEY?.startsWith('mock');
     try {
-      if (isMock) {
+      if (isMockMode) {
         await new Promise(resolve => setTimeout(resolve, 500));
         const { triggerMockAuthStateChange } = await import('@/hooks/useAuth');
         triggerMockAuthStateChange({
@@ -40,9 +39,8 @@ function App() {
     e.preventDefault();
     setLoggingIn(true);
     setError(null);
-    const isMock = import.meta.env.VITE_FIREBASE_API_KEY?.startsWith('mock');
     try {
-      if (isMock) {
+      if (isMockMode) {
         await new Promise(resolve => setTimeout(resolve, 500));
         const { triggerMockAuthStateChange } = await import('@/hooks/useAuth');
         triggerMockAuthStateChange({
@@ -80,8 +78,7 @@ function App() {
           <button
             style={{ width: 'auto', padding: '8px 16px' }}
             onClick={async () => {
-              const isMock = import.meta.env.VITE_FIREBASE_API_KEY?.startsWith('mock');
-              if (isMock) {
+              if (isMockMode) {
                 const { triggerMockAuthStateChange } = await import('@/hooks/useAuth');
                 triggerMockAuthStateChange(null);
               } else {

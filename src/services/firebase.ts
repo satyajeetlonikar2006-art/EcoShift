@@ -1,53 +1,67 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, connectAuthEmulator } from 'firebase/auth';
-import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
-import { getAnalytics } from 'firebase/analytics';
+import { initializeApp, FirebaseApp } from 'firebase/app';
+import { getAuth, connectAuthEmulator, Auth } from 'firebase/auth';
+import { getFirestore, connectFirestoreEmulator, Firestore } from 'firebase/firestore';
+import { getAnalytics, Analytics } from 'firebase/analytics';
 
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-};
+const apiKey = import.meta.env.VITE_FIREBASE_API_KEY;
+export const isMockMode = !apiKey || apiKey.startsWith('mock');
 
-// Initialize Firebase
-export const app = initializeApp(firebaseConfig);
+let appInstance: FirebaseApp;
+let authInstance: Auth;
+let dbInstance: Firestore;
+let analyticsInstance: Analytics | null = null;
 
-// Initialize services
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+if (isMockMode) {
+  appInstance = null as unknown as FirebaseApp;
+  authInstance = null as unknown as Auth;
+  dbInstance = null as unknown as Firestore;
+} else {
+  const firebaseConfig = {
+    apiKey,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  };
 
-// Initialize analytics conditionally, since it errors in node environments/emulators sometimes
-let analyticsInstance: ReturnType<typeof getAnalytics> | null = null;
-try {
-  if (typeof window !== 'undefined') {
-    analyticsInstance = getAnalytics(app);
-  }
-} catch (e) {
-  console.warn("Analytics failed to initialize:", e);
-}
-export const analytics = analyticsInstance;
+  // Initialize Firebase
+  appInstance = initializeApp(firebaseConfig);
 
-// Connect to emulators in development if explicitly configured
-if (import.meta.env.DEV && import.meta.env.VITE_USE_EMULATOR === 'true') {
+  // Initialize services
+  authInstance = getAuth(appInstance);
+  dbInstance = getFirestore(appInstance);
+
+  // Initialize analytics conditionally, since it errors in node environments/emulators sometimes
   try {
-    if (!auth.emulatorConfig) {
-      connectAuthEmulator(auth, 'http://localhost:9099', {
-        disableWarnings: true,
-      });
+    if (typeof window !== 'undefined') {
+      analyticsInstance = getAnalytics(appInstance);
     }
-  } catch (error) {
-    // Emulator already connected
+  } catch (e) {
+    console.warn("Analytics failed to initialize:", e);
   }
 
-  try {
-    // Check settings before connecting
-    connectFirestoreEmulator(db, 'localhost', 8080);
-  } catch (error) {
-    // Emulator already connected
+  // Connect to emulators in development if explicitly configured
+  if (import.meta.env.DEV && import.meta.env.VITE_USE_EMULATOR === 'true') {
+    try {
+      if (!authInstance.emulatorConfig) {
+        connectAuthEmulator(authInstance, 'http://localhost:9099', {
+          disableWarnings: true,
+        });
+      }
+    } catch (error) {
+      // Emulator already connected
+    }
+
+    try {
+      // Check settings before connecting
+      connectFirestoreEmulator(dbInstance, 'localhost', 8080);
+    } catch (error) {
+      // Emulator already connected
+    }
   }
 }
 
-export default app;
+export { appInstance as app, authInstance as auth, dbInstance as db, analyticsInstance as analytics };
+export default appInstance;
+

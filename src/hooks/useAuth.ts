@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { User as FirebaseUser, onAuthStateChanged } from 'firebase/auth';
-import { auth } from '@/services/firebase';
+import { auth, isMockMode } from '@/services/firebase';
 
 // Mock state management for offline preview mode
 let mockUserListeners: Array<(user: any) => void> = [];
@@ -31,8 +31,7 @@ export function useAuth() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const isMock = import.meta.env.VITE_FIREBASE_API_KEY?.startsWith('mock');
-    if (isMock) {
+    if (isMockMode) {
       const listener = (u: any) => {
         setUser(u);
         setLoading(false);

@@ -9,7 +9,9 @@ vi.mock('@/services/firebase', () => ({
   db: {},
   analytics: {},
   app: {},
+  isMockMode: false,
 }));
+
 
 // Mock environment variables
 import.meta.env.VITE_FIREBASE_API_KEY = 'test-key';

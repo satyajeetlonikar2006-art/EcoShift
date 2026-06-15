@@ -11,13 +11,13 @@ import {
   orderBy,
   limit,
 } from 'firebase/firestore';
-import { db, auth } from './firebase';
+import { db, auth, isMockMode } from './firebase';
 import { Activity } from '@/types';
 
 const ACTIVITIES_COLLECTION = 'activities';
 
 // Detect if we are in offline mock mode (e.g. previewing locally with mock credentials)
-const isMock = () => import.meta.env.VITE_FIREBASE_API_KEY?.startsWith('mock');
+const isMock = () => isMockMode;
 
 // Retrieve activities from local storage
 const getLocalActivities = (): Activity[] => {

@@ -31,7 +31,9 @@ vi.mock('@/services/firebase', () => ({
   db: {},
   analytics: {},
   app: {},
+  isMockMode: false,
 }));
+
 
 const mockUser = { uid: 'user-123', email: 'test@ecoshift.org' };
 
