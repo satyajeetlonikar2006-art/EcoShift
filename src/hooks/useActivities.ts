@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Activity } from '@/types';
 import { getActivities, getWeeklyActivities } from '@/services/firebaseDB';
 
@@ -18,7 +18,7 @@ export function useActivities(
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const refetch = () => setRefreshKey(prev => prev + 1);
+  const refetch = useCallback(() => setRefreshKey(prev => prev + 1), []);
 
   useEffect(() => {
     if (!userId) {

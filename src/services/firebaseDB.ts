@@ -79,7 +79,6 @@ export async function logActivity(
       updatedAt: new Date(),
     };
   } catch (error) {
-    console.error('Failed to log activity:', error);
     throw error;
   }
 }

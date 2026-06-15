@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import {
   calculateTransportEmissions,
   calculateFoodEmissions,
+  calculateHomeEmissions,
   calculateTotalEmissions,
   getCategoryBreakdown,
 } from '../carbonCalculator';
@@ -75,6 +76,41 @@ describe('carbonCalculator', () => {
     it('should throw for invalid food type', () => {
       expect(() => calculateFoodEmissions(500, 'invalid')).toThrow(
         'Unknown food type'
+      );
+    });
+  });
+
+  describe('calculateHomeEmissions', () => {
+    it('should calculate electricity emissions correctly', () => {
+      const result = calculateHomeEmissions(100, 'electricity_kwh');
+      expect(result).toBe(40); // 100 * 0.4
+    });
+
+    it('should calculate natural gas emissions correctly', () => {
+      const result = calculateHomeEmissions(10, 'natural_gas_m3');
+      expect(result).toBe(18); // 10 * 1.8
+    });
+
+    it('should calculate water emissions correctly and round', () => {
+      const result = calculateHomeEmissions(5, 'water_m3');
+      expect(result).toBe(1.2); // 5 * 0.24
+    });
+
+    it('should throw for zero amount', () => {
+      expect(() => calculateHomeEmissions(0, 'electricity_kwh')).toThrow(
+        'Amount must be positive'
+      );
+    });
+
+    it('should throw for negative amount', () => {
+      expect(() => calculateHomeEmissions(-5, 'electricity_kwh')).toThrow(
+        'Amount must be positive'
+      );
+    });
+
+    it('should throw for invalid resource type', () => {
+      expect(() => calculateHomeEmissions(10, 'invalid_resource')).toThrow(
+        'Unknown resource type'
       );
     });
   });

@@ -1,12 +1,17 @@
 import { VEHICLE_EMISSIONS, FOOD_EMISSIONS, HOME_EMISSIONS } from '@/constants/emissions';
-import { ActivityCategory, VehicleType } from '@/types';
+import { VehicleType } from '@/types';
+
+// Constants to eliminate magic numbers
+const ROUNDING_FACTOR = 100;
+const GRAMS_IN_KG = 1000;
+const WARNING_DISTANCE_THRESHOLD = 500;
 
 /**
  * Calculate CO₂ emissions for a transport activity
  * @param distance - Distance in km
  * @param vehicleType - Type of vehicle
  * @returns CO₂ in kg
- * @throws Error if distance is invalid
+ * @throws Error if distance is invalid or vehicle type is unknown
  */
 export function calculateTransportEmissions(
   distance: number,
@@ -16,7 +21,7 @@ export function calculateTransportEmissions(
     throw new Error('Distance must be positive');
   }
 
-  if (distance > 500) {
+  if (distance > WARNING_DISTANCE_THRESHOLD) {
     console.warn('Distance seems unusually high. Please verify.');
   }
 
@@ -25,7 +30,7 @@ export function calculateTransportEmissions(
     throw new Error(`Unknown vehicle type: ${vehicleType}`);
   }
 
-  return Math.round(distance * emissionFactor * 100) / 100; // Round to 2 decimals
+  return Math.round(distance * emissionFactor * ROUNDING_FACTOR) / ROUNDING_FACTOR;
 }
 
 /**
@@ -33,6 +38,7 @@ export function calculateTransportEmissions(
  * @param amount - Amount in grams
  * @param foodType - Type of food
  * @returns CO₂ in kg
+ * @throws Error if amount is invalid or food type is unknown
  */
 export function calculateFoodEmissions(amount: number, foodType: string): number {
   if (amount <= 0) {
@@ -45,19 +51,44 @@ export function calculateFoodEmissions(amount: number, foodType: string): number
   }
 
   // Convert grams to kg and multiply
-  const emissionsInKg = (amount / 1000) * emissionFactor;
-  return Math.round(emissionsInKg * 100) / 100;
+  const emissionsInKg = (amount / GRAMS_IN_KG) * emissionFactor;
+  return Math.round(emissionsInKg * ROUNDING_FACTOR) / ROUNDING_FACTOR;
+}
+
+/**
+ * Calculate CO₂ emissions for home energy
+ * @param amount - Amount in kWh or m3
+ * @param resourceType - Type of resource (electricity_kwh, natural_gas_m3, water_m3)
+ * @returns CO₂ in kg
+ * @throws Error if amount is invalid or resource type is unknown
+ */
+export function calculateHomeEmissions(amount: number, resourceType: string): number {
+  if (amount <= 0) {
+    throw new Error('Amount must be positive');
+  }
+
+  const emissionFactor = HOME_EMISSIONS[resourceType];
+  if (!emissionFactor && emissionFactor !== 0) {
+    throw new Error(`Unknown resource type: ${resourceType}`);
+  }
+
+  const emissionsInKg = amount * emissionFactor;
+  return Math.round(emissionsInKg * ROUNDING_FACTOR) / ROUNDING_FACTOR;
 }
 
 /**
  * Calculate total CO₂ for a list of activities
+ * @param emissions - Array of emission values in kg
+ * @returns Total emissions in kg
  */
 export function calculateTotalEmissions(emissions: number[]): number {
-  return Math.round(emissions.reduce((sum, val) => sum + val, 0) * 100) / 100;
+  return Math.round(emissions.reduce((sum, val) => sum + val, 0) * ROUNDING_FACTOR) / ROUNDING_FACTOR;
 }
 
 /**
  * Get category breakdown
+ * @param activities - Array of logged activities
+ * @returns Object mapping category to sum of emissions
  */
 export function getCategoryBreakdown(
   activities: { category: string; co2Impact: number }[]
@@ -70,3 +101,4 @@ export function getCategoryBreakdown(
     {} as Record<string, number>
   );
 }
+
