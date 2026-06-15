@@ -14,19 +14,33 @@ export function useActivities(
   { userId, period = 'all' }: UseActivitiesOptions = {}
 ) {
   const [activities, setActivities] = useState<Activity[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!!userId);
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+
+  const [prevUserId, setPrevUserId] = useState(userId);
+  const [prevPeriod, setPrevPeriod] = useState(period);
+  const [prevRefreshKey, setPrevRefreshKey] = useState(refreshKey);
+
+  // Sync state during render when inputs change
+  if (userId !== prevUserId || period !== prevPeriod || refreshKey !== prevRefreshKey) {
+    setPrevUserId(userId);
+    setPrevPeriod(period);
+    setPrevRefreshKey(refreshKey);
+    setLoading(!!userId);
+    if (!userId) {
+      setActivities([]);
+      setError(null);
+    }
+  }
 
   const refetch = useCallback(() => setRefreshKey(prev => prev + 1), []);
 
   useEffect(() => {
     if (!userId) {
-      setLoading(false);
       return;
     }
 
-    setLoading(true);
     const fetchActivities = async () => {
       try {
         const data =

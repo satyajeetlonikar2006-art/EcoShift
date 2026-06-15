@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ActivityForm } from '../ActivityForm';
+import { Activity } from '@/types';
 import { logActivity } from '@/services/firebaseDB';
 import { trackActivityLogged } from '@/services/googleAnalytics';
 import { calculateTransportEmissions, calculateFoodEmissions, calculateHomeEmissions } from '@/services/carbonCalculator';
@@ -57,9 +58,9 @@ describe('ActivityForm', () => {
   describe('Rendering (Transport tab default)', () => {
     it('renders category tabs', () => {
       setup();
-      expect(screen.getByRole('button', { name: /transport/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /food/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /home/i })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: /transport/i })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: /food/i })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: /home/i })).toBeInTheDocument();
     });
 
     it('renders vehicle type select by default', () => {
@@ -87,7 +88,7 @@ describe('ActivityForm', () => {
   describe('Category tab switching', () => {
     it('switches to food tab and shows food type select', async () => {
       const { user } = setup();
-      await user.click(screen.getByRole('button', { name: /food/i }));
+      await user.click(screen.getByRole('tab', { name: /food/i }));
 
       expect(screen.getByLabelText(/food type/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/amount/i)).toBeInTheDocument();
@@ -95,7 +96,7 @@ describe('ActivityForm', () => {
 
     it('switches to home tab and shows resource type select', async () => {
       const { user } = setup();
-      await user.click(screen.getByRole('button', { name: /home/i }));
+      await user.click(screen.getByRole('tab', { name: /home/i }));
 
       expect(screen.getByLabelText(/resource type/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/usage/i)).toBeInTheDocument();
@@ -209,7 +210,7 @@ describe('ActivityForm', () => {
   describe('Successful submission (Food tab)', () => {
     it('calls calculateFoodEmissions when food category is active', async () => {
       const { user } = setup();
-      await user.click(screen.getByRole('button', { name: /food/i }));
+      await user.click(screen.getByRole('tab', { name: /food/i }));
       await user.type(screen.getByLabelText(/amount/i), '500');
       await user.click(screen.getByRole('button', { name: /log activity/i }));
 
@@ -222,7 +223,7 @@ describe('ActivityForm', () => {
   describe('Successful submission (Home tab)', () => {
     it('calls calculateHomeEmissions when home category is active', async () => {
       const { user } = setup();
-      await user.click(screen.getByRole('button', { name: /home/i }));
+      await user.click(screen.getByRole('tab', { name: /home/i }));
       await user.type(screen.getByLabelText(/usage/i), '100');
       await user.click(screen.getByRole('button', { name: /log activity/i }));
 
@@ -292,7 +293,7 @@ describe('ActivityForm', () => {
 
   describe('Submit button state', () => {
     it('shows "Logging..." text during submission', async () => {
-      let resolveLogActivity: (value: any) => void;
+      let resolveLogActivity: (value: Activity) => void;
       mockLogActivity.mockReturnValueOnce(new Promise(resolve => { resolveLogActivity = resolve; }));
 
       const { user } = setup();

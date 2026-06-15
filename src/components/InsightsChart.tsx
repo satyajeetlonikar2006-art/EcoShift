@@ -39,7 +39,7 @@ export function InsightsChart({ data }: InsightsChartProps) {
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
-          <Tooltip formatter={(value: any) => `${parseFloat(value || 0).toFixed(2)} kg CO₂`} />
+          <Tooltip formatter={(value) => `${Number(value ?? 0).toFixed(2)} kg CO₂`} />
           <Legend />
         </PieChart>
       </ResponsiveContainer>

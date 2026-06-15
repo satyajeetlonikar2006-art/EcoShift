@@ -37,8 +37,8 @@ if (isMockMode) {
     if (typeof window !== 'undefined') {
       analyticsInstance = getAnalytics(appInstance);
     }
-  } catch (e) {
-    console.warn("Analytics failed to initialize:", e);
+  } catch {
+    // Analytics is optional — silently skip if unavailable
   }
 
   // Connect to emulators in development if explicitly configured
@@ -49,14 +49,14 @@ if (isMockMode) {
           disableWarnings: true,
         });
       }
-    } catch (error) {
+    } catch {
       // Emulator already connected
     }
 
     try {
       // Check settings before connecting
       connectFirestoreEmulator(dbInstance, 'localhost', 8080);
-    } catch (error) {
+    } catch {
       // Emulator already connected
     }
   }

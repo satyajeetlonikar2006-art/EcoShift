@@ -19,18 +19,25 @@ const ACTIVITIES_COLLECTION = 'activities';
 // Detect if we are in offline mock mode (e.g. previewing locally with mock credentials)
 const isMock = () => isMockMode;
 
+/** Shape of an activity record stored in localStorage (dates are serialised as strings) */
+interface RawStoredActivity extends Omit<Activity, 'date' | 'createdAt' | 'updatedAt'> {
+  date: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Retrieve activities from local storage
 const getLocalActivities = (): Activity[] => {
   const data = localStorage.getItem('ecoshift_activities');
   if (!data) return [];
   try {
-    return JSON.parse(data).map((item: any) => ({
+    return (JSON.parse(data) as RawStoredActivity[]).map((item) => ({
       ...item,
       date: new Date(item.date),
       createdAt: new Date(item.createdAt),
       updatedAt: new Date(item.updatedAt),
     }));
-  } catch (e) {
+  } catch {
     return [];
   }
 };
@@ -79,6 +86,7 @@ export async function logActivity(
       updatedAt: new Date(),
     };
   } catch (error) {
+    console.error('Failed to log activity:', error);
     throw error;
   }
 }

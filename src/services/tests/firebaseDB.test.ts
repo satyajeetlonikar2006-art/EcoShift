@@ -90,13 +90,14 @@ describe('firebaseDB', () => {
 
     it('should throw when user is not authenticated', async () => {
       // Temporarily set currentUser to null
-      const originalCurrentUser = (auth as any).currentUser;
-      (auth as any).currentUser = null;
+      const authMock = auth as unknown as { currentUser: unknown };
+      const originalCurrentUser = authMock.currentUser;
+      authMock.currentUser = null;
 
       await expect(logActivity(activityData)).rejects.toThrow('User not authenticated');
 
       // Restore
-      (auth as any).currentUser = originalCurrentUser;
+      authMock.currentUser = originalCurrentUser;
     });
 
     it('should propagate errors from addDoc', async () => {

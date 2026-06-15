@@ -4,7 +4,6 @@ import { VehicleType } from '@/types';
 // Constants to eliminate magic numbers
 const ROUNDING_FACTOR = 100;
 const GRAMS_IN_KG = 1000;
-const WARNING_DISTANCE_THRESHOLD = 500;
 
 /**
  * Calculate CO₂ emissions for a transport activity
@@ -20,9 +19,8 @@ export function calculateTransportEmissions(
   if (distance < 0) {
     throw new Error('Distance must be positive');
   }
-
-  if (distance > WARNING_DISTANCE_THRESHOLD) {
-    console.warn('Distance seems unusually high. Please verify.');
+  if (distance > 500) {
+    console.warn('Extremely long distance logged');
   }
 
   const emissionFactor = VEHICLE_EMISSIONS[vehicleType];

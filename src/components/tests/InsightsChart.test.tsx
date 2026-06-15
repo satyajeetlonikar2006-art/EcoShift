@@ -1,12 +1,13 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { InsightsChart } from '../InsightsChart';
 
 // Mock recharts – these components require SVG/canvas not available in happy-dom
 vi.mock('recharts', () => ({
-  PieChart: ({ children }: any) => <div data-testid="pie-chart">{children}</div>,
-  Pie: ({ data }: any) => (
+  PieChart: ({ children }: { children?: React.ReactNode }) => <div data-testid="pie-chart">{children}</div>,
+  Pie: ({ data }: { data?: { name: string; value: number }[] }) => (
     <div data-testid="pie">
-      {data?.map((d: any, i: number) => (
+      {data?.map((d, i) => (
         <span key={i} data-testid={`pie-segment-${i}`}>
           {d.name}: {d.value}
         </span>
@@ -16,7 +17,7 @@ vi.mock('recharts', () => ({
   Cell: () => <div data-testid="cell" />,
   Legend: () => <div data-testid="legend" />,
   Tooltip: () => <div data-testid="tooltip" />,
-  ResponsiveContainer: ({ children }: any) => <div data-testid="responsive-container">{children}</div>,
+  ResponsiveContainer: ({ children }: { children?: React.ReactNode }) => <div data-testid="responsive-container">{children}</div>,
 }));
 
 describe('InsightsChart', () => {

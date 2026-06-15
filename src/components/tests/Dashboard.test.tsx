@@ -18,7 +18,7 @@ vi.mock('@/hooks/useActivities', () => ({
 // Mock services
 const mockTrackPageView = vi.fn();
 vi.mock('@/services/googleAnalytics', () => ({
-  trackPageView: (...args: any[]) => mockTrackPageView(...args),
+  trackPageView: (...args: unknown[]) => mockTrackPageView(...args),
 }));
 
 vi.mock('@/services/carbonCalculator', () => ({

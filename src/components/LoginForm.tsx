@@ -33,8 +33,7 @@ export function LoginForm({ authError }: LoginFormProps) {
       } else {
         await signInAnonymously(auth);
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       setError('Guest login failed. Please ensure Firebase is running.');
     } finally {
       setLoggingIn(false);
@@ -57,8 +56,7 @@ export function LoginForm({ authError }: LoginFormProps) {
       } else {
         await signInWithEmailAndPassword(auth, email, password);
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       setError('Authentication failed. Check your credentials or try Guest Login.');
     } finally {
       setLoggingIn(false);

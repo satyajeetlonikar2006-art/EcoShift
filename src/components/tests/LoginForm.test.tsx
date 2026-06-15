@@ -7,8 +7,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const mockSignInAnonymously = vi.fn();
 const mockSignInWithEmailAndPassword = vi.fn();
 vi.mock('firebase/auth', () => ({
-  signInAnonymously: (...args: any[]) => mockSignInAnonymously(...args),
-  signInWithEmailAndPassword: (...args: any[]) => mockSignInWithEmailAndPassword(...args),
+  signInAnonymously: (...args: unknown[]) => mockSignInAnonymously(...args),
+  signInWithEmailAndPassword: (...args: unknown[]) => mockSignInWithEmailAndPassword(...args),
   onAuthStateChanged: vi.fn(),
 }));
 
