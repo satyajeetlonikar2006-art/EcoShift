@@ -1,0 +1,24 @@
+server {
+    # Listen on the port provided by Cloud Run via the $PORT environment variable
+    listen ${PORT};
+    server_name localhost;
+
+    # Serve static files from the Nginx default directory
+    location / {
+        root /usr/share/nginx/html;
+        index index.html index.htm;
+        
+        # This is critical for Single Page Applications (SPAs) like React/Vite.
+        # It ensures that if a route isn't found as a static file, it falls back to index.html
+        # so that React Router can handle the routing.
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Optional: Cache static assets
+    location ~* \.(?:ico|css|js|gif|jpe?g|png|woff2?|eot|ttf|svg)$ {
+        root /usr/share/nginx/html;
+        expires 6M;
+        access_log off;
+        add_header Cache-Control "public";
+    }
+}
